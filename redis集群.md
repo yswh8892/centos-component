@@ -1,4 +1,19 @@
 
+# 原理和工作模式
+
+```
+集群方案比较:
+
+redis3.0版本的集群模式
+哨兵模式：
+在redis3.0以前的版本要实现集群一般是借助哨兵sentinel工具来监控master节点的状态，如果master节点异常，则会做主从切换，将某一台slave作为master，哨兵的配置略微复杂，并且性能和高可用性等各方面表现一般，特别是在主从切换的瞬间存在访问瞬断的情况，而且哨兵模式只有一个主节点对外提供服务，没法支持很高的并发，且单个主节点内存也不宜设置得过大，否则会导致持久化文件过大，影响数据恢复或主从同步的效率。
+
+
+
+高可用集群模式
+redis集群是一个由多个主从节点群组成的分布式服务器群，它具有复制、高可用和分片特性。Redis集群不需要sentinel哨兵也能完成节点移除和故障转移的功能。需要将每个节点设置成集群模式，这种集群模式没有中心节点，可水平扩展，据官方文档称可以线性扩展到上万个节点(官方推荐不超过1000个节点)。redis集群的性能和高可用性均优于之前版本的哨兵模式，且集群配置非常简单。
+
+```
 # 准备工作
 
 准备好三台虚拟机：
@@ -22,7 +37,74 @@ cd /opt/redis-cluster/redis-5.0.4
 make
 
 make PREFIX=opt/redis-cluster install
+
+安装完后，在/opt/redis-cluster中增加 bin目录
+
 ```
+
+# 创建所需目录
+```
+mkdir -p /var/log/redis
+mkdir -p /data1/redis/7001
+mkdir -p /data1/redis/7002
+mkdir -p /opt/redis-cluster/conf/7001 /opt/redis-cluster/conf/7002
+
+```
+
+
+# 需要修改的配置
+
+```
+
+bind 192.168.1.150 127.0.0.1
+port 7001
+timeout 60
+daemonize yes #后台运行
+protected-mode no  #（需要不同服务器的节点连通，这个就要设置为 no）
+pidfile /var/run/redis_7001.pid
+loglevel warning
+logfile "/var/log/redis/redis_7001.log"
+databases 255
+dbfilename 7001dump.rdb
+dir /data1/redis/7001
+appendonly yes
+auto-aof-rewrite-min-size 1GB
+cluster-enabled yes
+cluster-config-file nodes-7001.conf
+cluster-node-timeout 5000
+
+
+分发到其他2台机器
+```
+
+# 启动
+
+```
+  在3台机器上分别启动
+  
+  /opt/redis-cluster/bin/redis-server /opt/redis-cluster/conf/7001/redis.conf
+  /opt/redis-cluster/bin/redis-server /opt/redis-cluster/conf/7002/redis.conf
+```
+
+# 创建集群
+
+```
+  /opt/redis-cluster/bin/redis-cli --cluster create 192.168.3.3:7001 192.168.3.4:7001 192.168.3.6:7001 192.168.3.3:7002 192.168.3.4:7002 192.168.3.6:7002 --cluster-replicas 1
+  
+```
+
+# 集群运维相关
+
+```
+
+/opt/redis-cluster/bin/redis-cli -h 192.168.3.3 -p 7001 -c  登录
+
+/opt/redis-cluster/bin/redis-cli --cluster check 192.168.3.3:7001 集群完整性检查
+
+
+```
+
+
 
 
 
