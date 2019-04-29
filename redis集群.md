@@ -133,6 +133,10 @@ dc8335f6151dbc7881d55d2cc5dc0e0b0986eebc 192.168.1.150:7002@17002 master - 0 155
 fe5995113f38b2823f2fa30b276def95f56b81d0 192.168.1.160:7001@17001 master - 0 1556505375716 2 connected 5461-10922
 
 
+
+/opt/redis-cluster/bin/redis-cli -c -h 192.168.1.150 -p 7001 shutdown  --关闭集群，需一个个关闭
+
+
 ```
 
 
