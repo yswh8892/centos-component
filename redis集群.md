@@ -102,6 +102,37 @@ cluster-node-timeout 5000
 /opt/redis-cluster/bin/redis-cli --cluster check 192.168.3.3:7001 集群完整性检查
 
 
+
+[root@k8s-master 7002]# /opt/redis-cluster/bin/redis-cli -h 192.168.1.150 -p 7001 -c  #集群信息
+192.168.1.150:7001>  
+192.168.1.150:7001> cluster info
+cluster_state:ok
+cluster_slots_assigned:16384
+cluster_slots_ok:16384
+cluster_slots_pfail:0
+cluster_slots_fail:0
+cluster_known_nodes:6
+cluster_size:3
+cluster_current_epoch:8
+cluster_my_epoch:7
+cluster_stats_messages_ping_sent:1528
+cluster_stats_messages_pong_sent:1598
+cluster_stats_messages_sent:3126
+cluster_stats_messages_ping_received:1598
+cluster_stats_messages_pong_received:1528
+cluster_stats_messages_received:3126
+
+
+
+192.168.1.150:7001> cluster nodes #节点信息
+a5d4cf467e1e61c0e6977858dae332029474c529 192.168.1.170:7001@17001 slave dc8335f6151dbc7881d55d2cc5dc0e0b0986eebc 0 1556505376000 8 connected
+c8cf578148cb6ba9094643603ae625ec0c47bbd2 192.168.1.170:7002@17002 slave fe5995113f38b2823f2fa30b276def95f56b81d0 0 1556505375000 6 connected
+7dac85f2bcab4c819023e7b3cc945969af283a81 192.168.1.160:7002@17002 master - 0 1556505375000 7 connected 0-5460
+feb8f7115a5a143903d75a13a2d657bf92fc500a 192.168.1.150:7001@17001 myself,slave 7dac85f2bcab4c819023e7b3cc945969af283a81 0 1556505376000 1 connected
+dc8335f6151dbc7881d55d2cc5dc0e0b0986eebc 192.168.1.150:7002@17002 master - 0 1556505376518 8 connected 10923-16383
+fe5995113f38b2823f2fa30b276def95f56b81d0 192.168.1.160:7001@17001 master - 0 1556505375716 2 connected 5461-10922
+
+
 ```
 
 
