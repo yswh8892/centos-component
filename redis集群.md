@@ -941,7 +941,7 @@ PrivateTmp=true
 WantedBy=multi-user.target
 
 
-systemctl enable redis-cluster7001 和 systemctl enable redis-cluster7002
+systemctl enable redis-cluster7001 && systemctl enable redis-cluster7002
 
 ```
 
