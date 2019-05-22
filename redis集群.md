@@ -918,6 +918,34 @@ fe5995113f38b2823f2fa30b276def95f56b81d0 192.168.1.160:7001@17001 master - 0 155
 ```
 
 
+# 开机自启动
+
+```
+
+每台机子上创建 redis-cluster7001.service 和 redis-cluster7002.service
+
+[root@kys-master02 7002]# vim /usr/lib/systemd/system/redis-cluster7001.service
+[Unit]
+Description=redis-cluster7001
+After=syslog.target network.target remote-fs.target nss-lookup.target
+
+[Service]
+Type=forking
+PIDFile=/var/run/redis_7001.pid
+ExecStart=/opt/redis-cluster/bin/redis-server /opt/redis-cluster/conf/7001/redis.conf
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s QUIT $MAINPID
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+
+
+systemctl enable redis-cluster7001 和 systemctl enable redis-cluster7002
+
+```
+
+
 
 
 
